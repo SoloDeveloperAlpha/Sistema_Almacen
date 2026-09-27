@@ -36,6 +36,9 @@ class StockFlowApplicationTests {
 	@Autowired
 	private ProductoRepository productoRepository;
 
+	@Autowired
+	private InventarioService inventarioService;
+
 	@Test
 	void contextLoads() {
 	}
@@ -122,20 +125,21 @@ class StockFlowApplicationTests {
 	void entryAndExitUpdateInventoryAndRejectInsufficientStock() throws Exception {
 		Usuario operador = usuarioRepository.save(new Usuario("operador_stock", "Operador Stock",
 				passwordEncoder.encode("clave-segura-2026")));
+		String codigoGenerado = inventarioService.siguienteCodigoProducto();
 
 		mockMvc.perform(post("/api/movimientos/entrada")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(
-						"{\"codigo\":\"TEST-001\",\"nombre\":\"Producto de prueba\",\"categoria\":\"Pruebas\",\"unidadMedida\":\"UDS\",\"cantidad\":10,\"stockMinimo\":2}"))
+						"{\"codigo\":\"CODIGO_IGNORADO\",\"nombre\":\"Producto de prueba\",\"categoria\":\"Pruebas\",\"unidadMedida\":\"UDS\",\"cantidad\":10,\"stockMinimo\":2}"))
 				.andExpect(status().isCreated());
 
 		String producto = mockMvc
 				.perform(get("/api/productos").header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion()))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-		org.hamcrest.MatcherAssert.assertThat(producto, org.hamcrest.Matchers.containsString("TEST-001"));
+		org.hamcrest.MatcherAssert.assertThat(producto, org.hamcrest.Matchers.containsString(codigoGenerado));
 
-		Long productoId = productoRepository.findByCodigoIgnoreCase("TEST-001").orElseThrow().getId();
+		Long productoId = productoRepository.findByCodigoIgnoreCase(codigoGenerado).orElseThrow().getId();
 		mockMvc.perform(post("/api/movimientos/salida")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion())
 				.contentType(MediaType.APPLICATION_JSON)
@@ -151,7 +155,7 @@ class StockFlowApplicationTests {
 		mockMvc.perform(get("/api/reportes/inventario.csv")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion()))
 				.andExpect(status().isOk())
-				.andExpect(content().string(org.hamcrest.Matchers.containsString("TEST-001")));
+				.andExpect(content().string(org.hamcrest.Matchers.containsString(codigoGenerado)));
 
 		mockMvc.perform(get("/api/reportes/movimientos.csv")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion()))
@@ -164,6 +168,21 @@ class StockFlowApplicationTests {
 		mockMvc.perform(get("/api/productos")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer token-invalido"))
 				.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	void nextProductCodeUsesSixDigitSequence() throws Exception {
+		Usuario operador = usuarioRepository.save(new Usuario("usuario_codigo", "Usuario Codigo",
+				passwordEncoder.encode("clave-segura-2026")));
+		String codigoBase = inventarioService.siguienteCodigoProducto();
+		productoRepository.save(new Producto(codigoBase, "Producto inicial", "Pruebas", "UDS", 1,
+				null, null, null));
+		String codigoEsperado = String.format("PROD-%06d", Integer.parseInt(codigoBase.substring(5)) + 1);
+
+		mockMvc.perform(get("/api/productos/siguiente-codigo")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion()))
+				.andExpect(status().isOk())
+				.andExpect(content().string(codigoEsperado));
 	}
 
 	@Test

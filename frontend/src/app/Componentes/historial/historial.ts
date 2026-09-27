@@ -2,6 +2,7 @@ import { afterNextRender, Component, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventarioService, Movimiento } from '../../Servicios/inventario.service';
+import { ErrorTemporal } from '../../Servicios/error-temporal';
 
 @Component({
   imports: [FormsModule, DatePipe],
@@ -14,6 +15,7 @@ export class Historial {
   filtros = { tipo: '', desde: '', hasta: '', buscar: '' };
   error = '';
   private readonly inventario = inject(InventarioService);
+  private readonly errorTemporal = new ErrorTemporal();
 
   constructor() {
     afterNextRender(() => this.cargar());
@@ -22,7 +24,7 @@ export class Historial {
   cargar(): void {
     this.inventario.movimientos(this.filtros).subscribe({
       next: (movimientos) => (this.movimientos = movimientos),
-      error: () => (this.error = 'No se pudo consultar el historial.'),
+      error: () => this.errorTemporal.mostrar('No se pudo consultar el historial.', (valor) => (this.error = valor)),
     });
   }
 

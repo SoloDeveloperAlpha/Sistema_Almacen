@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 import { SesionService } from './sesion.service';
 
 export interface Producto {
@@ -36,6 +36,13 @@ export interface ResumenInventario {
   movimientos: number;
 }
 
+export interface InventarioInicial {
+  productos: Producto[];
+  categorias: string[];
+  resumen: ResumenInventario;
+  siguienteCodigo: string;
+}
+
 export interface UsuarioAdministrado {
   id: number;
   usuario: string;
@@ -50,6 +57,8 @@ const API = 'http://localhost:8080/api';
 export class InventarioService {
   private readonly http = inject(HttpClient);
   private readonly sesion = inject(SesionService);
+  private inicial$?: Observable<InventarioInicial>;
+  private inicialToken = '';
 
   private headers() {
     return { Authorization: `Bearer ${this.sesion.token()}` };
@@ -62,6 +71,25 @@ export class InventarioService {
 
   categorias(): Observable<string[]> {
     return this.http.get<string[]>(`${API}/productos/categorias`, { headers: this.headers() });
+  }
+
+  inicial(): Observable<InventarioInicial> {
+    const token = this.sesion.token();
+    if (this.inicialToken !== token) {
+      this.inicial$ = undefined;
+      this.inicialToken = token;
+    }
+    this.inicial$ ??= this.http.get<InventarioInicial>(`${API}/inventario/inicial`, { headers: this.headers() }).pipe(shareReplay(1));
+    return this.inicial$;
+  }
+
+  invalidarInicial(): void {
+    this.inicial$ = undefined;
+    this.inicialToken = '';
+  }
+
+  siguienteCodigo(): Observable<string> {
+    return this.http.get(`${API}/productos/siguiente-codigo`, { headers: this.headers(), responseType: 'text' });
   }
 
   resumen(): Observable<ResumenInventario> {

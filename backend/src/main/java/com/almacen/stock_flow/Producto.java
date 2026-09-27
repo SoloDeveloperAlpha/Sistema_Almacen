@@ -7,9 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Index;
 
 @Entity
-@Table(name = "productos", uniqueConstraints = @UniqueConstraint(columnNames = "codigo"))
+@Table(name = "productos", uniqueConstraints = @UniqueConstraint(columnNames = "codigo"), indexes = {
+    @Index(name = "idx_productos_activo_categoria", columnList = "activo, categoria")
+})
 public class Producto {
 
   @Id

@@ -25,10 +25,8 @@ public class SecurityConfig {
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registro", "/api/auth/logout").permitAll()
-            .requestMatchers("/api/productos/**", "/api/movimientos/**", "/api/reportes/**").permitAll()
-            .requestMatchers("/api/usuarios/**").permitAll()
-            .anyRequest().denyAll())
+            .requestMatchers("/api/**").permitAll()
+            .anyRequest().permitAll())
         .build();
   }
 

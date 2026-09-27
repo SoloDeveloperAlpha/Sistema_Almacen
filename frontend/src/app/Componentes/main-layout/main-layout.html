@@ -54,9 +54,9 @@
         <div class="btn btn-primary btn-sm rounded-pill px-3 d-flex align-items-center gap-2 w-100 w-lg-auto justify-content-center">
           <span>{{ nombreUsuario() }}</span>
         </div>
-        <a class="btn btn-danger btn-sm d-flex align-items-center gap-2 rounded-pill px-3 w-auto flex-shrink-0 text-nowrap justify-content-center" routerLink="/login" (click)="cerrarSesion()">
+        <button type="button" class="btn btn-danger btn-sm d-flex align-items-center gap-2 rounded-pill px-3 w-auto flex-shrink-0 text-nowrap justify-content-center" (click)="cerrarSesion($event)">
           <span class="text-nowrap">Cerrar Sesión</span>
-        </a>
+        </button>
       </div>
     </div>
   </div>

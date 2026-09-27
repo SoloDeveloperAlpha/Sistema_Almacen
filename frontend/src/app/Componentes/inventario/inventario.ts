@@ -2,6 +2,7 @@ import { afterNextRender, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { InventarioService, Producto, ResumenInventario } from '../../Servicios/inventario.service';
+import { ErrorTemporal } from '../../Servicios/error-temporal';
 
 @Component({
   imports: [RouterLink, FormsModule],
@@ -19,21 +20,33 @@ export class Inventario {
   cargando = false;
 
   private readonly inventario = inject(InventarioService);
+  private readonly errorTemporal = new ErrorTemporal();
+
+  private mostrarError(mensaje: string): void {
+    this.errorTemporal.mostrar(mensaje, (valor) => (this.error = valor));
+  }
 
   constructor() {
     afterNextRender(() => {
-      this.inventario.categorias().subscribe({ next: (categorias) => (this.categorias = categorias), error: () => undefined });
-      this.inventario.resumen().subscribe({ next: (resumen) => (this.resumen = resumen), error: () => undefined });
-      this.cargar();
+      this.cargando = true;
+      this.inventario.inicial().subscribe({
+        next: (inicial) => {
+          this.productos = inicial.productos;
+          this.categorias = inicial.categorias;
+          this.resumen = inicial.resumen;
+          this.cargando = false;
+        },
+        error: () => { this.mostrarError('No se pudo cargar el inventario.'); this.cargando = false; },
+      });
     });
   }
 
   cargar(): void {
     this.cargando = true;
-    this.error = '';
+    this.errorTemporal.limpiar((valor) => (this.error = valor));
     this.inventario.productos(this.buscar, this.categoria).subscribe({
       next: (productos) => (this.productos = productos),
-      error: () => (this.error = 'No se pudo consultar el inventario.'),
+      error: () => this.mostrarError('No se pudo consultar el inventario.'),
       complete: () => (this.cargando = false),
     });
   }

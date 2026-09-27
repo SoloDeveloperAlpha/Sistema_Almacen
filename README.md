@@ -101,6 +101,7 @@ Solo una cuenta cuyo nombre coincida con esa variable recibe el rol `ADMINISTRAD
 
 - **Inventario:** consulta de stock, indicadores, búsqueda por nombre o código y filtro por categoría.
 - **Entradas:** crea productos nuevos o suma existencias a un producto existente.
+- **Códigos SKU:** genera automáticamente códigos consecutivos con el formato `PROD-000000`, comenzando desde `PROD-000000` cuando no hay productos.
 - **Salidas:** descuenta existencias y rechaza cantidades superiores al stock disponible.
 - **Historial:** filtra movimientos por fechas, tipo y producto, mostrando usuario y fecha.
 - **Usuarios:** gestión administrativa de roles y estado de las cuentas.

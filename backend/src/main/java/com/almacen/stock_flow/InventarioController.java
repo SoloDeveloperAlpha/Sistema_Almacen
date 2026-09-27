@@ -40,6 +40,18 @@ public class InventarioController {
     return inventarioService.categorias();
   }
 
+  @GetMapping("/inventario/inicial")
+  public InventarioService.InventarioInicial inicial(@RequestHeader("Authorization") String authorization) {
+    usuarioService.buscarActivoPorToken(authorization);
+    return inventarioService.inicial();
+  }
+
+  @GetMapping("/productos/siguiente-codigo")
+  public String siguienteCodigo(@RequestHeader("Authorization") String authorization) {
+    usuarioService.buscarActivoPorToken(authorization);
+    return inventarioService.siguienteCodigoProducto();
+  }
+
   @PostMapping("/movimientos/entrada")
   public ResponseEntity<MovimientoResponse> entrada(@RequestHeader("Authorization") String authorization,
       @Valid @RequestBody InventarioService.EntradaRequest request) {

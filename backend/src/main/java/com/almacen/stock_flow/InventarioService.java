@@ -42,15 +42,29 @@ public class InventarioService {
         .map(Producto::getCategoria).distinct().sorted().toList();
   }
 
+  public synchronized String siguienteCodigoProducto() {
+    return siguienteCodigoProducto(productoRepository.findAll());
+  }
+
+  private String siguienteCodigoProducto(List<Producto> productos) {
+    int siguiente = productos.stream()
+        .map(Producto::getCodigo)
+        .filter(codigo -> codigo != null && codigo.matches("PROD-\\d{6}"))
+        .mapToInt(codigo -> Integer.parseInt(codigo.substring(5)))
+        .max()
+        .orElse(-1) + 1;
+    return String.format(Locale.ROOT, "PROD-%06d", siguiente);
+  }
+
   @Transactional
-  public Movimiento registrarEntrada(EntradaRequest request, String authorization) {
+  public synchronized Movimiento registrarEntrada(EntradaRequest request, String authorization) {
     Usuario actor = usuarioService.buscarActivoPorToken(authorization);
     if (request.cantidad() <= 0)
       throw badRequest("La cantidad debe ser mayor que cero.");
-    Producto producto = productoRepository.findByCodigoIgnoreCase(request.codigo().trim())
-        .orElseGet(() -> new Producto(request.codigo().trim(), request.nombre().trim(), request.categoria().trim(),
-            request.unidadMedida().trim(), request.stockMinimo(), request.ubicacion(), request.proveedor(),
-            request.observaciones()));
+    String codigoGenerado = siguienteCodigoProducto();
+    Producto producto = new Producto(codigoGenerado, request.nombre().trim(), request.categoria().trim(),
+        request.unidadMedida().trim(), request.stockMinimo(), request.ubicacion(), request.proveedor(),
+        request.observaciones());
     producto.sumarStock(request.cantidad());
     Producto guardado = productoRepository.save(producto);
     return movimientoRepository
@@ -101,6 +115,16 @@ public class InventarioService {
         productos.stream().filter(p -> p.getStockActual() == 0).count(), movimientoRepository.count());
   }
 
+  public InventarioInicial inicial() {
+    List<Producto> productos = productoRepository.findAll().stream().filter(Producto::isActivo).toList();
+    List<String> categorias = productos.stream().map(Producto::getCategoria).distinct().sorted().toList();
+    ReporteResumen resumen = new ReporteResumen(productos.size(),
+        productos.stream().mapToInt(Producto::getStockActual).sum(),
+        productos.stream().filter(p -> p.getStockActual() > 0 && p.getStockActual() <= p.getStockMinimo()).count(),
+        productos.stream().filter(p -> p.getStockActual() == 0).count(), movimientoRepository.count());
+    return new InventarioInicial(productos, categorias, resumen, siguienteCodigoProducto(productos));
+  }
+
   public String reporteInventarioCsv() {
     StringBuilder csv = new StringBuilder("codigo,nombre,categoria,unidad,stock_actual,stock_minimo,ubicacion\n");
     productoRepository.findAll().stream().filter(Producto::isActivo).forEach(producto -> csv
@@ -141,5 +165,9 @@ public class InventarioService {
   }
 
   public record ReporteResumen(long productos, long unidades, long stockBajo, long agotados, long movimientos) {
+  }
+
+  public record InventarioInicial(List<Producto> productos, List<String> categorias, ReporteResumen resumen,
+      String siguienteCodigo) {
   }
 }

@@ -10,6 +10,10 @@ export class SesionService {
 
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
+  constructor() {
+    this.restaurarUsuario();
+  }
+
   establecerUsuario(nombre: string, usuario = nombre, rol: 'ADMINISTRADOR' | 'OPERATIVO' = 'OPERATIVO', token = ''): void {
     this.nombreUsuario.set(nombre);
     this.usuario.set(usuario);

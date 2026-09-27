@@ -30,10 +30,10 @@ public class Usuario {
   private String contrasena;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false, length = 20)
+  @Column(nullable = false, length = 20, columnDefinition = "varchar(20) default 'OPERATIVO'")
   private Rol rol;
 
-  @Column(nullable = false)
+  @Column(nullable = false, columnDefinition = "boolean default true")
   private boolean activo = true;
 
   @Column(length = 36, unique = true)
