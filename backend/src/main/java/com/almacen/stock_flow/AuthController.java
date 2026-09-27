@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,13 +25,19 @@ public class AuthController {
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
     Usuario usuario = usuarioService.autenticar(request.usuario(), request.contrasena());
-    return ResponseEntity.ok(new LoginResponse(usuario.getNombre()));
+    return ResponseEntity.ok(LoginResponse.desde(usuario));
   }
 
   @PostMapping("/registro")
   public ResponseEntity<LoginResponse> registrar(@Valid @RequestBody RegistroRequest request) {
     Usuario usuario = usuarioService.registrar(request.usuario(), request.nombre(), request.contrasena());
-    return ResponseEntity.status(HttpStatus.CREATED).body(new LoginResponse(usuario.getNombre()));
+    return ResponseEntity.status(HttpStatus.CREATED).body(LoginResponse.desde(usuario));
+  }
+
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authorization) {
+    usuarioService.cerrarSesion(authorization);
+    return ResponseEntity.noContent().build();
   }
 
   public record LoginRequest(
@@ -44,6 +51,9 @@ public class AuthController {
       @NotBlank @Size(min = 8, max = 72) String contrasena) {
   }
 
-  public record LoginResponse(String nombre) {
+  public record LoginResponse(String usuario, String nombre, Rol rol, String token) {
+    static LoginResponse desde(Usuario usuario) {
+      return new LoginResponse(usuario.getUsuario(), usuario.getNombre(), usuario.getRol(), usuario.getTokenSesion());
+    }
   }
 }

@@ -42,7 +42,7 @@ export class Login {
           ? this.autenticacion.registrar(usernameValue.trim(), nameValue.trim(), passwordValue)
           : this.autenticacion.autenticar(usernameValue.trim(), passwordValue),
       );
-      this.sesion.establecerUsuario(respuesta.nombre);
+      this.sesion.establecerUsuario(respuesta.nombre, respuesta.usuario, respuesta.rol, respuesta.token);
       await this.router.navigateByUrl('/inventario');
     } catch (error) {
       if (error instanceof TimeoutError) {

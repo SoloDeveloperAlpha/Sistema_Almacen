@@ -1,10 +1,64 @@
-import { Component } from '@angular/core';
+import { afterNextRender, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { InventarioService, Producto, ResumenInventario } from '../../Servicios/inventario.service';
 
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, FormsModule],
   selector: 'app-inventario',
   styleUrl: './inventario.css',
   templateUrl: './inventario.html',
 })
-export class Inventario {}
+export class Inventario {
+  productos: Producto[] = [];
+  categorias: string[] = [];
+  resumen: ResumenInventario = { productos: 0, unidades: 0, stockBajo: 0, agotados: 0, movimientos: 0 };
+  buscar = '';
+  categoria = '';
+  error = '';
+  cargando = false;
+
+  private readonly inventario = inject(InventarioService);
+
+  constructor() {
+    afterNextRender(() => {
+      this.inventario.categorias().subscribe({ next: (categorias) => (this.categorias = categorias), error: () => undefined });
+      this.inventario.resumen().subscribe({ next: (resumen) => (this.resumen = resumen), error: () => undefined });
+      this.cargar();
+    });
+  }
+
+  cargar(): void {
+    this.cargando = true;
+    this.error = '';
+    this.inventario.productos(this.buscar, this.categoria).subscribe({
+      next: (productos) => (this.productos = productos),
+      error: () => (this.error = 'No se pudo consultar el inventario.'),
+      complete: () => (this.cargando = false),
+    });
+  }
+
+  limpiar(): void {
+    this.buscar = '';
+    this.categoria = '';
+    this.cargar();
+  }
+
+  estado(producto: Producto): string {
+    if (producto.stockActual === 0) return 'Agotado';
+    if (producto.stockActual <= producto.stockMinimo) return 'Stock bajo';
+    return 'Disponible';
+  }
+
+  descargarReporte(): void {
+    this.inventario.reporteInventario().subscribe((archivo) => this.descargar(archivo, 'inventario.csv'));
+  }
+
+  private descargar(archivo: Blob, nombre: string): void {
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(archivo);
+    enlace.download = nombre;
+    enlace.click();
+    URL.revokeObjectURL(enlace.href);
+  }
+}

@@ -41,7 +41,7 @@ Base de datos: stock_flow
 Usuario: root
 ```
 
-La aplicacion crea automaticamente la base `stock_flow` y la tabla `usuarios` si la cuenta configurada tiene permisos suficientes. No es necesario ejecutar un script SQL inicial.
+La aplicacion crea automaticamente la base `stock_flow` y las tablas `usuarios`, `productos` y `movimientos` si la cuenta configurada tiene permisos suficientes. Las relaciones guardan cada movimiento asociado al producto y al usuario que lo registro. No es necesario ejecutar un script SQL inicial.
 
 ## Ejecutar en desarrollo
 
@@ -53,11 +53,7 @@ En **PowerShell** (Windows):
 
 ```powershell
 $env:DB_USERNAME = "root"
-<<<<<<< HEAD
 $env:DB_PASSWORD = "TU_CONTRASENA_DE_MYSQL"
-=======
-$env:DB_PASSWORD = "123456789"
->>>>>>> 7476741a20c9a6f95ce568904cd2dd7aebc6127d
 .\backend\mvnw.cmd -f backend\pom.xml spring-boot:run
 ```
 
@@ -85,11 +81,30 @@ En la segunda terminal, desde la raiz:
 npm start
 ```
 
-Abre [http://localhost:4200](http://localhost:4200) en el navegador. El frontend utiliza la API en `http://localhost:8080/api/auth`.
+Abre [http://localhost:4200](http://localhost:4200) en el navegador. El frontend utiliza la API en `http://localhost:8080/api`.
+Al iniciar sesión, el backend entrega un token temporal que Angular usa para autorizar las consultas y registrar quién realiza cada movimiento.
+Los tokens caducan por defecto después de 8 horas; puedes cambiarlo con `SESSION_DURATION_HOURS` antes de iniciar Spring Boot.
 
 ## Primer acceso
 
-Spring Boot crea la tabla `usuarios`, pero no crea usuarios predeterminados. En la pantalla de inicio de sesion, usa el enlace de registro para crear la primera cuenta. El nombre de usuario debe ser unico y la contrasena debe tener al menos 8 caracteres.
+Spring Boot crea la tabla `usuarios`, pero no crea usuarios predeterminados. En la pantalla de inicio de sesion, usa el enlace de registro para crear una cuenta operativa. El nombre de usuario debe ser unico y la contrasena debe tener al menos 8 caracteres.
+
+Para crear el primer administrador, define su nombre de usuario antes de iniciar Spring Boot y registra esa cuenta desde la pantalla de registro:
+
+```powershell
+$env:BOOTSTRAP_ADMIN_USERNAME = "admin"
+```
+
+Solo una cuenta cuyo nombre coincida con esa variable recibe el rol `ADMINISTRADOR`. Después de iniciar sesion, el administrador puede abrir **Usuarios** para activar cuentas y cambiar roles. Las cuentas normales tienen el rol `OPERATIVO`.
+
+## Funcionalidades conectadas
+
+- **Inventario:** consulta de stock, indicadores, búsqueda por nombre o código y filtro por categoría.
+- **Entradas:** crea productos nuevos o suma existencias a un producto existente.
+- **Salidas:** descuenta existencias y rechaza cantidades superiores al stock disponible.
+- **Historial:** filtra movimientos por fechas, tipo y producto, mostrando usuario y fecha.
+- **Usuarios:** gestión administrativa de roles y estado de las cuentas.
+- **Reportes:** el resumen del inventario muestra productos, unidades, stock bajo, agotados y cantidad de movimientos; además puedes descargar CSV del inventario y de los movimientos filtrados.
 
 Si Angular se sirve desde un origen distinto de `http://localhost:4200`, configura la variable `FRONTEND_ORIGINS` antes de iniciar el backend:
 

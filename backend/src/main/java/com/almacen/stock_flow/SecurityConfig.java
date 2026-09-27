@@ -25,7 +25,9 @@ public class SecurityConfig {
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registro").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/auth/registro", "/api/auth/logout").permitAll()
+            .requestMatchers("/api/productos/**", "/api/movimientos/**", "/api/reportes/**").permitAll()
+            .requestMatchers("/api/usuarios/**").permitAll()
             .anyRequest().denyAll())
         .build();
   }
@@ -49,8 +51,8 @@ public class SecurityConfig {
       }
     }
     configuration.setAllowedOrigins(origins);
-    configuration.setAllowedMethods(List.of("POST", "OPTIONS"));
-    configuration.setAllowedHeaders(List.of("Content-Type"));
+    configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of("Content-Type", "Authorization"));
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/api/**", configuration);
