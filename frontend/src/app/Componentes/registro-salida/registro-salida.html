@@ -1,14 +1,54 @@
 <div class="container bg-white p-4 rounded-4 shadow-sm border border-light" style="max-width: 750px">
-  <div class="mb-4"><span class="text-uppercase text-danger font-monospace small">Movimiento de inventario</span><h2 class="fw-bold">Registrar salida</h2><p class="text-muted">La cantidad se descontará del stock disponible.</p></div>
-  @if (error) { <div class="alert alert-danger">{{ error }}</div> }
-  @if (cargandoProductos) { <div class="text-muted py-3">Cargando productos...</div> }
+  <div class="mb-4">
+    <span class="text-uppercase text-danger font-monospace small">Movimiento de inventario</span>
+    <h2 class="fw-bold">Registrar salida</h2>
+    <p class="text-muted">La cantidad se descontará del stock disponible.</p>
+  </div>
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+  @if (cargandoProductos) {
+    <div class="text-muted py-3">Cargando productos...</div>
+  }
   <form class="row g-3" (ngSubmit)="guardar()">
-    <div class="col-12"><label class="form-label">Producto *</label><select class="form-select" [(ngModel)]="datos.productoId" name="productoId" required [disabled]="cargandoProductos"><option [ngValue]="0" disabled>Selecciona un producto</option>@for (producto of productos; track producto.id) { <option [ngValue]="producto.id">{{ producto.codigo }} - {{ producto.nombre }} (stock: {{ producto.stockActual }})</option> }</select></div>
-    @if (productoSeleccionado(); as producto) { <div class="col-12"><div class="alert alert-primary py-2">Stock disponible: <strong>{{ producto.stockActual }} {{ producto.unidadMedida }}</strong></div></div> }
-    <div class="col-md-6"><label class="form-label">Cantidad *</label><input class="form-control" type="number" min="1" [max]="productoSeleccionado()?.stockActual ?? 0" [(ngModel)]="datos.cantidad" name="cantidad" required /></div>
-    <div class="col-md-6"><label class="form-label">Motivo *</label><select class="form-select" [(ngModel)]="datos.motivo" name="motivo"><option>Despacho a cliente</option><option>Mantenimiento interno</option><option>Merma / daño</option><option>Ajuste de inventario</option></select></div>
-    <div class="col-12"><label class="form-label">Destino / solicitante</label><input class="form-control" [(ngModel)]="datos.destino" name="destino" /></div>
-    <div class="col-12"><label class="form-label">Observaciones</label><textarea class="form-control" [(ngModel)]="datos.observaciones" name="observaciones" rows="3"></textarea></div>
-    <div class="col-12 d-flex justify-content-end gap-2"><a routerLink="/inventario" class="btn btn-light">Cancelar</a><button class="btn btn-danger" type="submit" [disabled]="guardando || cargandoProductos || !datos.productoId">{{ guardando ? 'Guardando...' : 'Guardar salida' }}</button></div>
+    <div class="col-12">
+      <label class="form-label">Producto *</label>
+      <select class="form-select" [(ngModel)]="datos.productoId" name="productoId" required [disabled]="cargandoProductos">
+        <option [ngValue]="0" disabled>Selecciona un producto</option>
+        @for (producto of productos; track producto.id) {
+          <option [ngValue]="producto.id">{{ producto.codigo }} - {{ producto.nombre }} (stock: {{ producto.stockActual }})</option>
+        }
+      </select>
+    </div>
+    @if (productoSeleccionado(); as producto) {
+      <div class="col-12">
+        <div class="alert alert-primary py-2">Stock disponible: <strong>{{ producto.stockActual }} {{ producto.unidadMedida }}</strong></div>
+      </div>
+    }
+    <div class="col-md-6">
+      <label class="form-label">Cantidad *</label>
+      <input class="form-control" type="number" min="1" [max]="productoSeleccionado()?.stockActual ?? 0" [(ngModel)]="datos.cantidad" name="cantidad" required />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label">Motivo *</label>
+      <select class="form-select" [(ngModel)]="datos.motivo" name="motivo">
+        <option>Despacho a cliente</option>
+        <option>Mantenimiento interno</option>
+        <option>Merma / daño</option>
+        <option>Ajuste de inventario</option>
+      </select>
+    </div>
+    <div class="col-12">
+      <label class="form-label">Destino / solicitante</label>
+      <input class="form-control" [(ngModel)]="datos.destino" name="destino" />
+    </div>
+    <div class="col-12">
+      <label class="form-label">Observaciones</label>
+      <textarea class="form-control" [(ngModel)]="datos.observaciones" name="observaciones" rows="3"></textarea>
+    </div>
+    <div class="col-12 d-flex justify-content-end gap-2">
+      <a routerLink="/inventario" class="btn btn-light">Cancelar</a>
+      <button class="btn btn-danger" type="submit" [disabled]="guardando || cargandoProductos || !datos.productoId">{{ guardando ? 'Guardando...' : 'Guardar salida' }}</button>
+    </div>
   </form>
 </div>

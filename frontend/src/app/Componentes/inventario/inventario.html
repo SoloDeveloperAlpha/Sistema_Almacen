@@ -5,26 +5,94 @@
       <h2 class="fw-bold text-dark m-0">Inventario disponible</h2>
       <p class="text-muted small m-0">Consulta el stock actual y localiza productos rápidamente.</p>
     </div>
-    <div class="d-flex gap-2"><button class="btn btn-outline-primary" type="button" (click)="descargarReporte()"><i class="bi bi-download me-1"></i>Exportar CSV</button><a class="btn btn-success" routerLink="/registro-entrada"><i class="bi bi-plus-circle me-1"></i>Registrar entrada</a></div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary" type="button" (click)="descargarReporte()"><i class="bi bi-download me-1"></i>Exportar CSV</button>
+      <a class="btn btn-success" routerLink="/registro-entrada"><i class="bi bi-plus-circle me-1"></i>Registrar entrada</a>
+    </div>
   </div>
   <div class="row g-3 mb-4">
-    <div class="col-md-3"><div class="p-3 bg-light rounded-4 border"><span class="text-muted small d-block">Productos</span><strong class="fs-4">{{ resumen.productos }}</strong></div></div>
-    <div class="col-md-3"><div class="p-3 bg-light rounded-4 border"><span class="text-muted small d-block">Unidades disponibles</span><strong class="fs-4">{{ resumen.unidades }}</strong></div></div>
-    <div class="col-md-3"><div class="p-3 bg-light rounded-4 border"><span class="text-muted small d-block">Stock bajo</span><strong class="fs-4 text-warning">{{ resumen.stockBajo }}</strong></div></div>
-    <div class="col-md-3"><div class="p-3 bg-light rounded-4 border"><span class="text-muted small d-block">Agotados</span><strong class="fs-4 text-danger">{{ resumen.agotados }}</strong></div></div>
+    <div class="col-md-3">
+      <div class="p-3 bg-light rounded-4 border">
+        <span class="text-muted small d-block">Productos</span>
+        <strong class="fs-4">{{ resumen.productos }}</strong>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="p-3 bg-light rounded-4 border">
+        <span class="text-muted small d-block">Unidades disponibles</span>
+        <strong class="fs-4">{{ resumen.unidades }}</strong>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="p-3 bg-light rounded-4 border">
+        <span class="text-muted small d-block">Stock bajo</span>
+        <strong class="fs-4 text-warning">{{ resumen.stockBajo }}</strong>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="p-3 bg-light rounded-4 border">
+        <span class="text-muted small d-block">Agotados</span>
+        <strong class="fs-4 text-danger">{{ resumen.agotados }}</strong>
+      </div>
+    </div>
   </div>
   <form class="row g-2 mb-4 bg-light p-3 rounded-4 border" (ngSubmit)="cargar()">
-    <div class="col-md-6"><input class="form-control" [(ngModel)]="buscar" name="buscar" placeholder="Buscar por nombre o código" /></div>
-    <div class="col-md-3"><select class="form-select" [(ngModel)]="categoria" name="categoria"><option value="">Todas las categorías</option>@for (item of categorias; track item) { <option [value]="item">{{ item }}</option> }</select></div>
-    <div class="col-md-3 d-flex gap-2"><button class="btn btn-primary flex-fill" type="submit"><i class="bi bi-search me-1"></i>Buscar</button><button class="btn btn-outline-secondary" type="button" (click)="limpiar()">Limpiar</button></div>
+    <div class="col-md-6">
+      <input class="form-control" [(ngModel)]="buscar" name="buscar" placeholder="Buscar por nombre o código" />
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" [(ngModel)]="categoria" name="categoria">
+        <option value="">Todas las categorías</option>
+        @for (item of categorias; track item) {
+          <option [value]="item">{{ item }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button class="btn btn-primary flex-fill" type="submit"><i class="bi bi-search me-1"></i>Buscar</button>
+      <button class="btn btn-outline-secondary" type="button" (click)="limpiar()">Limpiar</button>
+    </div>
   </form>
-  @if (error) { <div class="alert alert-danger">{{ error }}</div> }
-  @if (cargando) { <div class="text-muted py-3">Cargando inventario...</div> }
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+  @if (cargando) {
+    <div class="text-muted py-3">Cargando inventario...</div>
+  }
   @if (!cargando) {
-  <div class="table-responsive">
-    <table class="table table-hover align-middle"><thead class="table-light"><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
-      <tbody>@for (producto of productos; track producto.id) { <tr><td class="font-monospace">{{ producto.codigo }}</td><td class="fw-semibold">{{ producto.nombre }}</td><td>{{ producto.categoria }}</td><td>{{ producto.stockActual }} {{ producto.unidadMedida }}</td><td><span class="badge" [class.bg-success]="estado(producto) === 'Disponible'" [class.bg-warning]="estado(producto) === 'Stock bajo'" [class.bg-danger]="estado(producto) === 'Agotado'">{{ estado(producto) }}</span></td><td><a class="btn btn-sm btn-outline-danger" [routerLink]="['/registro-salida']" [queryParams]="{ productoId: producto.id }">Registrar salida</a></td></tr> } @empty { <tr><td colspan="6" class="text-center text-muted py-4">No hay productos que coincidan con la búsqueda.</td></tr> }</tbody>
-    </table>
-  </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Código</th>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (producto of productos; track producto.id) {
+            <tr>
+              <td class="font-monospace">{{ producto.codigo }}</td>
+              <td class="fw-semibold">{{ producto.nombre }}</td>
+              <td>{{ producto.categoria }}</td>
+              <td>{{ producto.stockActual }} {{ producto.unidadMedida }}</td>
+              <td>
+                <span class="badge" [class.bg-success]="estado(producto) === 'Disponible'" [class.bg-warning]="estado(producto) === 'Stock bajo'" [class.bg-danger]="estado(producto) === 'Agotado'">{{ estado(producto) }}</span>
+              </td>
+              <td>
+                <a class="btn btn-sm btn-outline-danger" [routerLink]="['/registro-salida']" [queryParams]="{ productoId: producto.id }">Registrar salida</a>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">No hay productos que coincidan con la búsqueda.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   }
 </div>
