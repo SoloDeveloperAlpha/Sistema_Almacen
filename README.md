@@ -10,7 +10,7 @@ In PowerShell, provide the MySQL credentials in the backend terminal before star
 
 ```powershell
 $env:DB_USERNAME = "root"
-$env:DB_PASSWORD = "your-local-mysql-password"
+$env:DB_PASSWORD = "123456789"
 .\backend\mvnw.cmd -f backend\pom.xml spring-boot:run
 ```
 
