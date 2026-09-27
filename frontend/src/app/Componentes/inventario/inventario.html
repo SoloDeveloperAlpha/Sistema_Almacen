@@ -1,0 +1,534 @@
+<div class="container bg-white p-4 rounded-4 shadow-sm border border-light">
+  <!-- Encabezado del Módulo -->
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <span
+        class="text-uppercase text-muted font-monospace small tracking-wider"
+        style="font-size: 0.75rem"
+        >📦 Módulo Almacén Central</span
+      >
+      <h2 class="fw-bold text-dark m-0" style="letter-spacing: -0.5px">Control de Inventario</h2>
+      <p class="text-muted small m-0">
+        Gestión de existencias, clasificación técnica y alertas de reposición.
+      </p>
+    </div>
+    <!-- Botón verde que abre el popup del componente externo mediante Bootstrap -->
+    <a
+      class="btn btn-success d-flex align-items-center gap-2 py-2 px-3 rounded-3 fw-semibold shadow-sm"
+      style="background-color: #007542; border-color: #007542"
+      routerLink="/registro-entrada"
+    >
+      <i class="bi bi-plus-circle"></i> Registrar Entrada
+    </a>
+  </div>
+
+  <!-- Fila de Tarjetas de Indicadores (KPIs) -->
+  <div class="row g-3 mb-4">
+    <!-- Total Registrados -->
+    <div class="col-md-3">
+      <div class="p-3 bg-light rounded-4 d-flex justify-content-between align-items-center border">
+        <div>
+          <span class="text-muted small d-block">Total Registrados</span>
+          <span class="fs-5 fw-bold text-dark">18 Artículos</span>
+        </div>
+        <div
+          class="bg-primary bg-opacity-10 text-primary p-2 rounded-3 d-flex align-items-center justify-content-center"
+          style="width: 38px; height: 38px"
+        >
+          <i class="bi bi-boxes fs-5"></i>
+        </div>
+      </div>
+    </div>
+    <!-- En Stock Óptimo -->
+    <div class="col-md-3">
+      <div class="p-3 bg-light rounded-4 d-flex justify-content-between align-items-center border">
+        <div>
+          <span class="text-muted small d-block">En Stock Óptimo</span>
+          <span class="fs-5 fw-bold text-dark">12 Disponibles</span>
+        </div>
+        <div
+          class="bg-success bg-opacity-10 text-success p-2 rounded-3 d-flex align-items-center justify-content-center"
+          style="width: 38px; height: 38px"
+        >
+          <i class="bi bi-check-circle-fill fs-5"></i>
+        </div>
+      </div>
+    </div>
+    <!-- Alerta Reposición -->
+    <div class="col-md-3">
+      <div class="p-3 bg-light rounded-4 d-flex justify-content-between align-items-center border">
+        <div>
+          <span class="text-muted small d-block">Alerta Reposición</span>
+          <span class="fs-5 fw-bold text-dark">4 En Crítico</span>
+        </div>
+        <div
+          class="bg-secondary bg-opacity-10 text-secondary p-2 rounded-3 d-flex align-items-center justify-content-center"
+          style="width: 38px; height: 38px"
+        >
+          <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        </div>
+      </div>
+    </div>
+    <!-- Sin Existencias -->
+    <div class="col-md-3">
+      <div class="p-3 bg-light rounded-4 d-flex justify-content-between align-items-center border">
+        <div>
+          <span class="text-muted small d-block">Sin Existencias</span>
+          <span class="fs-5 fw-bold text-danger">2 Agotados</span>
+        </div>
+        <div
+          class="bg-danger bg-opacity-10 text-danger p-2 rounded-3 d-flex align-items-center justify-content-center"
+          style="width: 38px; height: 38px"
+        >
+          <i class="bi bi-slash-circle-fill fs-5"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de Filtros y Búsqueda -->
+  <div class="row g-2 mb-4 bg-light p-3 rounded-4 border">
+    <div class="col-md-6">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0 text-muted"
+          ><i class="bi bi-search"></i
+        ></span>
+        <input
+          type="text"
+          class="form-control border-start-0"
+          placeholder="Buscar producto por nombre o código..."
+        />
+      </div>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select">
+        <option>Todas las Categorías</option>
+        <option>Herramientas</option>
+        <option>Eléctrico</option>
+        <option>Repuestos</option>
+      </select>
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button
+        class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 fw-semibold"
+        style="background-color: #0d6efd"
+      >
+        <i class="bi bi-funnel-fill"></i> Buscar
+      </button>
+      <button class="btn btn-outline-secondary px-3">Limpiar</button>
+    </div>
+  </div>
+
+  <!-- Tabla de Inventario -->
+  <div class="table-responsive rounded-3 border">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light text-muted small border-bottom">
+        <tr>
+          <th class="ps-3 fw-semibold text-secondary">ID</th>
+          <th class="fw-semibold text-secondary">Código</th>
+          <th class="fw-semibold text-secondary">Nombre del Producto</th>
+          <th class="fw-semibold text-secondary">Categoría</th>
+          <th class="fw-semibold text-secondary">Stock Actual</th>
+          <th class="fw-semibold text-secondary">Estado</th>
+          <th class="text-center fw-semibold text-secondary" style="width: 180px">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="small">
+        <!-- Fila 1 -->
+        <tr class="border-bottom border-light">
+          <td class="text-muted ps-3">#01</td>
+          <td>
+            <span class="badge bg-light text-secondary border font-monospace px-2 py-1"
+              >HR-1842</span
+            >
+          </td>
+          <td class="fw-semibold text-dark">
+            <i class="bi bi-circle-fill text-success me-2" style="font-size: 0.5rem"></i> Taladro
+            Percutor Industrial 750W
+          </td>
+          <td><span class="text-muted">Herramientas</span></td>
+          <td class="fw-bold">24 <span class="fw-normal text-muted">u.</span></td>
+          <td>
+            <span
+              class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1 fw-medium"
+              ><i class="bi bi-circle-fill me-1" style="font-size: 0.4rem"></i> Disponible</span
+            >
+          </td>
+          <td class="text-center">
+            <button
+              class="btn btn-outline-primary btn-sm rounded-3 me-1 px-2.5 py-1 border-light bg-light text-primary"
+              style="font-size: 0.75rem"
+            >
+              <i class="bi bi-pencil"></i> Editar
+            </button>
+            <button
+              class="btn btn-outline-danger btn-sm rounded-3 px-2.5 py-1 border-light bg-light text-danger"
+              style="font-size: 0.75rem"
+            >
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </td>
+        </tr>
+        <!-- Fila 2 -->
+        <tr class="border-bottom border-light">
+          <td class="text-muted ps-3">#02</td>
+          <td>
+            <span class="badge bg-light text-secondary border font-monospace px-2 py-1"
+              >EL-2819</span
+            >
+          </td>
+          <td class="fw-semibold text-dark">
+            <i class="bi bi-circle-fill text-success me-2" style="font-size: 0.5rem"></i> Cable
+            Conductor Cobre THHN #12 (Rollo 100m)
+          </td>
+          <td><span class="text-muted">Eléctrico</span></td>
+          <td class="fw-bold">15 <span class="fw-normal text-muted">u.</span></td>
+          <td>
+            <span
+              class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-1 fw-medium"
+              ><i class="bi bi-circle-fill me-1" style="font-size: 0.4rem"></i> Disponible</span
+            >
+          </td>
+          <td class="text-center">
+            <button
+              class="btn btn-outline-primary btn-sm rounded-3 me-1 px-2.5 py-1 border-light bg-light text-primary"
+              style="font-size: 0.75rem"
+            >
+              <i class="bi bi-pencil"></i> Editar
+            </button>
+            <button
+              class="btn btn-outline-danger btn-sm rounded-3 px-2.5 py-1 border-light bg-light text-danger"
+              style="font-size: 0.75rem"
+            >
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </td>
+        </tr>
+        <!-- Fila 3 -->
+        <tr class="border-bottom border-light">
+          <td class="text-muted ps-3">#03</td>
+          <td>
+            <span class="badge bg-light text-secondary border font-monospace px-2 py-1"
+              >RP-8881</span
+            >
+          </td>
+          <td class="fw-semibold text-dark">
+            <i class="bi bi-circle-fill text-secondary me-2" style="font-size: 0.5rem"></i> Juego de
+            Rodamientos Rígidos 6204-2RS
+          </td>
+          <td><span class="text-muted">Repuestos</span></td>
+          <td class="fw-bold">3 <span class="fw-normal text-muted">u.</span></td>
+          <td>
+            <span
+              class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-1 fw-medium"
+              ><i class="bi bi-circle-fill me-1" style="font-size: 0.4rem"></i> Stock Bajo</span
+            >
+          </td>
+          <td class="text-center">
+            <button
+              class="btn btn-outline-primary btn-sm rounded-3 me-1 px-2.5 py-1 border-light bg-light text-primary"
+              style="font-size: 0.75rem"
+            >
+              <i class="bi bi-pencil"></i> Editar
+            </button>
+            <button
+              class="btn btn-outline-danger btn-sm rounded-3 px-2.5 py-1 border-light bg-light text-danger"
+              style="font-size: 0.75rem"
+            >
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </td>
+        </tr>
+        <!-- Fila 4 -->
+        <tr class="border-bottom border-light">
+          <td class="text-muted ps-3">#04</td>
+          <td>
+            <span class="badge bg-light text-secondary border font-monospace px-2 py-1"
+              >EL-5538</span
+            >
+          </td>
+          <td class="fw-semibold text-dark">
+            <i class="bi bi-circle-fill text-danger me-2" style="font-size: 0.5rem"></i> Disyuntor
+            Termomagnético Bipolar 25A DIN
+          </td>
+          <td><span class="text-muted">Eléctrico</span></td>
+          <td class="fw-bold text-danger">0 <span class="fw-normal text-muted">u.</span></td>
+          <td>
+            <span
+              class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-1 fw-medium"
+              ><i class="bi bi-circle-fill me-1" style="font-size: 0.4rem"></i> Agotado</span
+            >
+          </td>
+          <td class="text-center">
+            <button
+              class="btn btn-outline-primary btn-sm rounded-3 me-1 px-2.5 py-1 border-light bg-light text-primary"
+              style="font-size: 0.75rem"
+            >
+              <i class="bi bi-pencil"></i> Editar
+            </button>
+            <button
+              class="btn btn-outline-danger btn-sm rounded-3 px-2.5 py-1 border-light bg-light text-danger"
+              style="font-size: 0.75rem"
+            >
+              <i class="bi bi-trash"></i> Eliminar
+            </button>
+          </td>
+
+          <!--
+<div class="container bg-white p-4 rounded-4 shadow-sm border border-light">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="fw-bold text-dark m-0">Lista de Productos en Inventario</h4>
+      <p class="text-muted small m-0">Control general de existencias para prácticas de almacén.</p>
+    </div>
+    <button
+      class="btn btn-success d-flex align-items-center gap-2 py-2 px-3 rounded-3 fw-semibold shadow-sm"
+      style="background-color: #198754; border-color: #198754"
+    >
+      <i class="bi bi-plus-circle"></i> + Agregar Producto
+    </button>
+  </div>
+
+
+  <div class="row g-2 mb-4 bg-light p-3 rounded-4 border border-light">
+    <div class="col-md-7">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0 text-muted"
+          ><i class="bi bi-search"></i
+        ></span>
+        <input
+          type="text"
+          class="form-control border-start-0 bg-white"
+          placeholder="Buscar producto..."
+        />
+      </div>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select bg-white">
+        <option>Todas las categorías</option>
+        <option>Motores</option>
+        <option>Hidráulica</option>
+        <option>Electricidad</option>
+        <option>Repuestos</option>
+        <option>Lubricantes</option>
+        <option>Sensores</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button
+        class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 fw-semibold"
+        style="background-color: #0d6efd"
+      >
+        <i class="bi bi-funnel-fill"></i> Buscar
+      </button>
+    </div>
+  </div>
+
+
+  <div class="table-responsive rounded-3">
+    <table class="table align-middle mb-0">
+      <thead class="table-light text-muted small border-bottom">
+        <tr>
+          <th class="ps-3 text-secondary fw-semibold">ID</th>
+          <th class="text-secondary fw-semibold">Código</th>
+          <th class="text-secondary fw-semibold">Nombre del Producto</th>
+          <th class="text-secondary fw-semibold">Categoría</th>
+          <th class="text-secondary fw-semibold text-center">Cantidad</th>
+          <th class="text-end pe-3 text-secondary fw-semibold">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="small text-dark">
+
+        <tr class="border-bottom border-light">
+          <td class="text-muted ps-3">1</td>
+          <td class="fw-bold font-monospace text-secondary">PRD-001</td>
+          <td>Motor Eléctrico 2HP</td>
+          <td>
+            <span
+              class="badge bg-primary bg-opacity-10 text-primary px-2.5 py-1.5 fw-medium border border-primary border-opacity-10"
+              style="
+                color: #4a6b82 !important;
+                background-color: #eef2f6 !important;
+                border: none !important;
+              "
+              >Motores</span
+            >
+          </td>
+          <td class="text-center fw-semibold">45</td>
+          <td class="text-end pe-3">
+            <button
+              class="btn btn-link text-primary btn-sm me-2 text-decoration-none p-0 fw-medium"
+            >
+              Editar
+            </button>
+            <button class="btn btn-link text-danger btn-sm text-decoration-none p-0 fw-medium">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+
+        <tr class="border-bottom border-light">
+          <td class="text-muted ps-3">2</td>
+          <td class="fw-bold font-monospace text-secondary">PRD-002</td>
+          <td>Válvula de Presión</td>
+          <td>
+            <span
+              class="badge px-2.5 py-1.5 fw-medium"
+              style="color: #4a6b82 !important; background-color: #eef2f6 !important"
+              >Hidráulica</span
+            >
+          </td>
+          <td class="text-center fw-semibold">12</td>
+          <td class="text-end pe-3">
+            <button
+              class="btn btn-link text-primary btn-sm me-2 text-decoration-none p-0 fw-medium"
+            >
+              Editar
+            </button>
+            <button class="btn btn-link text-danger btn-sm text-decoration-none p-0 fw-medium">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+
+        <tr class="border-bottom border-light">
+          <td class="text-muted ps-3">3</td>
+          <td class="fw-bold font-monospace text-secondary">PRD-003</td>
+          <td>Cable Unipolar 4mm</td>
+          <td>
+            <span
+              class="badge px-2.5 py-1.5 fw-medium"
+              style="color: #4a6b82 !important; background-color: #eef2f6 !important"
+              >Electricidad</span
+            >
+          </td>
+          <td class="text-center fw-semibold">100</td>
+          <td class="text-end pe-3">
+            <button
+              class="btn btn-link text-primary btn-sm me-2 text-decoration-none p-0 fw-medium"
+            >
+              Editar
+            </button>
+            <button class="btn btn-link text-danger btn-sm text-decoration-none p-0 fw-medium">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+
+        <tr class="border-bottom border-light">
+          <td class="text-muted ps-3">4</td>
+          <td class="fw-bold font-monospace text-secondary">PRD-004</td>
+          <td>Rodamiento 6204</td>
+          <td>
+            <span
+              class="badge px-2.5 py-1.5 fw-medium"
+              style="color: #4a6b82 !important; background-color: #eef2f6 !important"
+              >Repuestos</span
+            >
+          </td>
+          <td class="text-center">
+            <span
+              class="badge bg-danger bg-opacity-10 text-danger border-0 px-2 py-1 fw-semibold"
+              style="font-size: 0.75rem"
+              >Agotado</span
+            >
+          </td>
+          <td class="text-end pe-3">
+            <button
+              class="btn btn-link text-primary btn-sm me-2 text-decoration-none p-0 fw-medium"
+            >
+              Editar
+            </button>
+            <button class="btn btn-link text-danger btn-sm text-decoration-none p-0 fw-medium">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+
+        <tr class="border-bottom border-light">
+          <td class="text-muted ps-3">5</td>
+          <td class="fw-bold font-monospace text-secondary">PRD-005</td>
+          <td>Aceite Hidráulico ISO 68</td>
+          <td>
+            <span
+              class="badge px-2.5 py-1.5 fw-medium"
+              style="color: #4a6b82 !important; background-color: #eef2f6 !important"
+              >Lubricantes</span
+            >
+          </td>
+          <td class="text-center fw-semibold">20</td>
+          <td class="text-end pe-3">
+            <button
+              class="btn btn-link text-primary btn-sm me-2 text-decoration-none p-0 fw-medium"
+            >
+              Editar
+            </button>
+            <button class="btn btn-link text-danger btn-sm text-decoration-none p-0 fw-medium">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+
+        <tr class="border-bottom border-light">
+          <td class="text-muted ps-3">6</td>
+          <td class="fw-bold font-monospace text-secondary">PRD-006</td>
+          <td>Sensor Fotoeléctrico</td>
+          <td>
+            <span
+              class="badge px-2.5 py-1.5 fw-medium"
+              style="color: #4a6b82 !important; background-color: #eef2f6 !important"
+              >Sensores</span
+            >
+          </td>
+          <td class="text-center fw-semibold">8</td>
+          <td class="text-end pe-3">
+            <button
+              class="btn btn-link text-primary btn-sm me-2 text-decoration-none p-0 fw-medium"
+            >
+              Editar
+            </button>
+            <button class="btn btn-link text-danger btn-sm text-decoration-none p-0 fw-medium">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <div class="d-flex justify-content-between align-items-center mt-4 small text-muted">
+    <div>
+      Mostrando registros del <span class="fw-semibold">1 al 6</span> de un total de 18 • Página 1
+      de 3
+    </div>
+    <nav>
+      <ul class="pagination pagination-sm m-0 gap-1">
+        <li class="page-item">
+          <a class="page-link rounded-3 border px-3 text-dark bg-light" href="#">Anterior</a>
+        </li>
+        <li class="page-item active">
+          <a class="page-link rounded-3 px-3 fw-bold" style="background-color: #0d6efd" href="#"
+            >1</a
+          >
+        </li>
+        <li class="page-item">
+          <a class="page-link rounded-3 border px-3 text-dark bg-white" href="#">2</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link rounded-3 border px-3 text-dark bg-white" href="#">3</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link rounded-3 border px-3 text-dark bg-white" href="#">Siguiente</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+-->
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

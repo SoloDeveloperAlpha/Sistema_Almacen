@@ -1,0 +1,145 @@
+<div
+  class="container bg-white p-4 rounded-4 shadow-sm border border-light"
+  style="max-width: 750px"
+>
+  <!-- Encabezado del Módulo -->
+  <div class="mb-4">
+    <span
+      class="text-uppercase text-primary font-monospace small tracking-wider fw-semibold"
+      style="font-size: 0.75rem"
+    >
+      <i class="bi bi-box-arrow-up"></i> Módulo Académico de Salidas
+    </span>
+    <h3 class="fw-bold text-dark mt-1 mb-0" style="letter-spacing: -0.5px">
+      Registrar Salida de Mercadería
+    </h3>
+    <p class="text-muted small m-0">Formulario básico para descontar stock del almacén.</p>
+  </div>
+
+  <!-- Tarjeta del Formulario -->
+  <div class="card border border-light rounded-4 shadow-sm overflow-hidden mb-3">
+    <!-- Barra de título de la sección -->
+    <div
+      class="card-header bg-light border-bottom border-light px-4 py-3 d-flex justify-content-between align-items-center"
+    >
+      <span class="fw-semibold text-dark small d-flex align-items-center gap-2">
+        <i class="bi bi-list-task text-secondary"></i> Datos de la Salida
+      </span>
+      <span
+        class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25 rounded-2 font-monospace px-2 py-1"
+        style="font-size: 0.7rem"
+      >
+        Paso Único
+      </span>
+    </div>
+
+    <!-- Cuerpo del Formulario -->
+    <div class="card-body p-4">
+      <form>
+        <!-- Seleccionar Producto -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-1.5">
+            <label class="form-label fw-semibold text-dark small mb-0"
+              >Seleccionar Producto <span class="text-danger">*</span></label
+            >
+            <span class="text-muted font-monospace" style="font-size: 0.75rem"
+              >Código / Descripción</span
+            >
+          </div>
+          <select class="form-select bg-light border-light py-2">
+            <option selected>PRD-001 - Motor Eléctrico 2HP (Stock actual: 45)</option>
+            <option>PRD-002 - Válvula de Presión (Stock actual: 12)</option>
+            <option>PRD-003 - Cable Unipolar 4mm (Stock actual: 100)</option>
+          </select>
+        </div>
+
+        <!-- Banner de Stock Disponible -->
+        <div
+          class="alert alert-primary border-0 rounded-3 d-flex align-items-center p-2.5 mb-4"
+          style="background-color: #eef4ff; color: #1d4ed8"
+        >
+          <i class="bi bi-building-up fs-5 me-2.5"></i>
+          <span class="small fw-medium">
+            Stock disponible en almacén: <span class="fw-bold">45 unidades</span>
+          </span>
+        </div>
+
+        <!-- Fila de Cantidad y Motivo -->
+        <div class="row g-3 mb-4">
+          <!-- Cantidad a Retirar -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-dark small mb-1.5"
+              >Cantidad a Retirar <span class="text-danger">*</span></label
+            >
+            <input type="number" class="form-control bg-light border-light py-2" value="1" />
+            <span class="text-muted d-block mt-1" style="font-size: 0.75rem"
+              >Máximo 45 piezas permitidas</span
+            >
+          </div>
+
+          <!-- Motivo -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold text-dark small mb-1.5"
+              >Motivo <span class="text-danger">*</span></label
+            >
+            <select class="form-select bg-light border-light py-2">
+              <option selected>Mantenimiento interno</option>
+              <option>Despacho a cliente</option>
+              <option>Merma / Daño</option>
+              <option>Ajuste de inventario</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Destino / Solicitante -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold text-dark small mb-1.5"
+            >Destino / Solicitante <span class="text-danger">*</span></label
+          >
+          <input
+            type="text"
+            class="form-control bg-light border-light py-2"
+            placeholder="Ej: Taller Mecánico Central"
+          />
+        </div>
+
+        <!-- Observaciones -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-1.5">
+            <label class="form-label fw-semibold text-dark small mb-0">Observaciones</label>
+            <span class="text-muted font-monospace" style="font-size: 0.75rem">Opcional</span>
+          </div>
+          <textarea
+            class="form-control bg-light border-light"
+            rows="3"
+            placeholder="Detalle o justificación opcional..."
+          ></textarea>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="d-flex justify-content-end gap-2 pt-2 border-top border-light">
+          <button
+            type="button"
+            class="btn btn-secondary px-4 py-2 fw-semibold d-flex align-items-center gap-2 rounded-3 shadow-sm"
+            style="background-color: #4b5563; border-color: #4b5563"
+          >
+            <i class="bi bi-x-lg"></i> Cancelar
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary px-4 py-2 fw-semibold d-flex align-items-center gap-2 rounded-3 shadow-sm"
+            style="background-color: #0d6efd; border-color: #0d6efd"
+          >
+            <i class="bi bi-check-lg"></i> Guardar Salida
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Pie de página informativo -->
+  <div class="text-muted text-center pt-2" style="font-size: 0.75rem">
+    <i class="bi bi-info-circle"></i> Esta operación reducirá automáticamente el kardex físico en la
+    base de datos de práctica.
+  </div>
+</div>
