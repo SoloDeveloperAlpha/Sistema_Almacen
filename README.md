@@ -53,7 +53,11 @@ En **PowerShell** (Windows):
 
 ```powershell
 $env:DB_USERNAME = "root"
+<<<<<<< HEAD
 $env:DB_PASSWORD = "TU_CONTRASENA_DE_MYSQL"
+=======
+$env:DB_PASSWORD = "123456789"
+>>>>>>> 7476741a20c9a6f95ce568904cd2dd7aebc6127d
 .\backend\mvnw.cmd -f backend\pom.xml spring-boot:run
 ```
 
