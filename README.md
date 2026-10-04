@@ -100,8 +100,8 @@ Solo una cuenta cuyo nombre coincida con esa variable recibe el rol `ADMINISTRAD
 ## Funcionalidades conectadas
 
 - **Inventario:** consulta de stock, indicadores, búsqueda por nombre o código y filtro por categoría.
-- **Entradas:** crea productos nuevos o suma existencias a un producto existente.
-- **Códigos SKU:** genera automáticamente códigos consecutivos con el formato `PROD-000000`, comenzando desde `PROD-000000` cuando no hay productos.
+- **Entradas:** crea productos nuevos o, si ya existe un producto activo con el mismo nombre, categoría y proveedor (sin distinguir mayúsculas/minúsculas), suma la cantidad a su stock existente en lugar de duplicarlo. El proveedor es obligatorio.
+- **Códigos SKU:** se generan automáticamente al registrar una entrada, a partir de las iniciales del nombre del producto, las 3 primeras letras de la categoría y las 3 primeras letras del proveedor (sin acentos ni espacios), seguidas de un consecutivo de 4 dígitos (por ejemplo `THFERACM-0001`). El código nunca se solicita ni se muestra en el formulario antes de guardar.
 - **Salidas:** descuenta existencias y rechaza cantidades superiores al stock disponible.
 - **Historial:** filtra movimientos por fechas, tipo y producto, mostrando usuario y fecha.
 - **Usuarios:** gestión administrativa de roles y estado de las cuentas.

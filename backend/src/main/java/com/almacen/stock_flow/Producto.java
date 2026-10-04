@@ -40,7 +40,7 @@ public class Producto {
   @Column(length = 100)
   private String ubicacion;
 
-  @Column(length = 150)
+  @Column(nullable = false, length = 150)
   private String proveedor;
 
   @Column(length = 500)

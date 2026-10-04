@@ -1,5 +1,6 @@
 package com.almacen.stock_flow;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,9 +36,6 @@ class StockFlowApplicationTests {
 
 	@Autowired
 	private ProductoRepository productoRepository;
-
-	@Autowired
-	private InventarioService inventarioService;
 
 	@Test
 	void contextLoads() {
@@ -125,14 +123,16 @@ class StockFlowApplicationTests {
 	void entryAndExitUpdateInventoryAndRejectInsufficientStock() throws Exception {
 		Usuario operador = usuarioRepository.save(new Usuario("operador_stock", "Operador Stock",
 				passwordEncoder.encode("clave-segura-2026")));
-		String codigoGenerado = inventarioService.siguienteCodigoProducto();
 
 		mockMvc.perform(post("/api/movimientos/entrada")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(
-						"{\"codigo\":\"CODIGO_IGNORADO\",\"nombre\":\"Producto de prueba\",\"categoria\":\"Pruebas\",\"unidadMedida\":\"UDS\",\"cantidad\":10,\"stockMinimo\":2}"))
+						"{\"nombre\":\"Producto de prueba\",\"categoria\":\"Pruebas\",\"unidadMedida\":\"UDS\",\"cantidad\":10,\"stockMinimo\":2,\"proveedor\":\"Proveedor Prueba\"}"))
 				.andExpect(status().isCreated());
+
+		String codigoGenerado = productoRepository.findAll().stream()
+				.filter(p -> p.getNombre().equalsIgnoreCase("Producto de prueba")).findFirst().orElseThrow().getCodigo();
 
 		String producto = mockMvc
 				.perform(get("/api/productos").header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion()))
@@ -164,6 +164,31 @@ class StockFlowApplicationTests {
 	}
 
 	@Test
+	void secondEntryForSameProductSumsStockInsteadOfDuplicating() throws Exception {
+		Usuario operador = usuarioRepository.save(new Usuario("operador_reingreso", "Operador Reingreso",
+				passwordEncoder.encode("clave-segura-2026")));
+
+		mockMvc.perform(post("/api/movimientos/entrada")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(
+						"{\"nombre\":\"Tornillo hexagonal\",\"categoria\":\"Ferreteria\",\"unidadMedida\":\"UDS\",\"cantidad\":10,\"stockMinimo\":2,\"proveedor\":\"Acme\"}"))
+				.andExpect(status().isCreated());
+
+		mockMvc.perform(post("/api/movimientos/entrada")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(
+						"{\"nombre\":\"tornillo HEXAGONAL\",\"categoria\":\"ferreteria\",\"unidadMedida\":\"uds\",\"cantidad\":5,\"stockMinimo\":2,\"proveedor\":\"ACME\"}"))
+				.andExpect(status().isCreated());
+
+		List<Producto> productos = productoRepository.findAll().stream()
+				.filter(p -> p.getNombre().equalsIgnoreCase("Tornillo hexagonal")).toList();
+		org.hamcrest.MatcherAssert.assertThat(productos, org.hamcrest.Matchers.hasSize(1));
+		org.hamcrest.MatcherAssert.assertThat(productos.get(0).getStockActual(), org.hamcrest.Matchers.equalTo(15));
+	}
+
+	@Test
 	void inventoryRejectsInvalidSessionToken() throws Exception {
 		mockMvc.perform(get("/api/productos")
 				.header(HttpHeaders.AUTHORIZATION, "Bearer token-invalido"))
@@ -171,18 +196,36 @@ class StockFlowApplicationTests {
 	}
 
 	@Test
-	void nextProductCodeUsesSixDigitSequence() throws Exception {
-		Usuario operador = usuarioRepository.save(new Usuario("usuario_codigo", "Usuario Codigo",
+	void productCodeIsGeneratedFromNameCategorySupplierAndAvoidsPrefixCollisions() throws Exception {
+		Usuario operador = usuarioRepository.save(new Usuario("operador_codigo", "Operador Codigo",
 				passwordEncoder.encode("clave-segura-2026")));
-		String codigoBase = inventarioService.siguienteCodigoProducto();
-		productoRepository.save(new Producto(codigoBase, "Producto inicial", "Pruebas", "UDS", 1,
-				null, null, null));
-		String codigoEsperado = String.format("PROD-%06d", Integer.parseInt(codigoBase.substring(5)) + 1);
 
-		mockMvc.perform(get("/api/productos/siguiente-codigo")
-				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion()))
-				.andExpect(status().isOk())
-				.andExpect(content().string(codigoEsperado));
+		mockMvc.perform(post("/api/movimientos/entrada")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(
+						"{\"nombre\":\"Valvula Industrial\",\"categoria\":\"Hidraulica\",\"unidadMedida\":\"UDS\",\"cantidad\":10,\"stockMinimo\":2,\"proveedor\":\"Zeta\"}"))
+				.andExpect(status().isCreated());
+
+		mockMvc.perform(post("/api/movimientos/entrada")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion())
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(
+						"{\"nombre\":\"Vagon Industrial\",\"categoria\":\"Hidraulica\",\"unidadMedida\":\"UDS\",\"cantidad\":5,\"stockMinimo\":2,\"proveedor\":\"Zeta\"}"))
+				.andExpect(status().isCreated());
+
+		Producto primero = productoRepository.findAll().stream()
+				.filter(p -> p.getNombre().equalsIgnoreCase("Valvula Industrial")).findFirst().orElseThrow();
+		Producto segundo = productoRepository.findAll().stream()
+				.filter(p -> p.getNombre().equalsIgnoreCase("Vagon Industrial")).findFirst().orElseThrow();
+
+		String prefijoEsperado = "VIHIDZET";
+		org.hamcrest.MatcherAssert.assertThat(primero.getCodigo(),
+				org.hamcrest.Matchers.matchesPattern(prefijoEsperado + "-\\d{4}"));
+		org.hamcrest.MatcherAssert.assertThat(segundo.getCodigo(),
+				org.hamcrest.Matchers.matchesPattern(prefijoEsperado + "-\\d{4}"));
+		org.hamcrest.MatcherAssert.assertThat(segundo.getCodigo(),
+				org.hamcrest.Matchers.not(org.hamcrest.Matchers.equalTo(primero.getCodigo())));
 	}
 
 	@Test

@@ -1,4 +1,4 @@
-import { afterNextRender, Component, inject } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InventarioService, Movimiento } from '../../Servicios/inventario.service';
@@ -15,6 +15,7 @@ export class Historial {
   filtros = { tipo: '', desde: '', hasta: '', buscar: '' };
   error = '';
   private readonly inventario = inject(InventarioService);
+  private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly errorTemporal = new ErrorTemporal();
 
   constructor() {
@@ -23,8 +24,8 @@ export class Historial {
 
   cargar(): void {
     this.inventario.movimientos(this.filtros).subscribe({
-      next: (movimientos) => (this.movimientos = movimientos),
-      error: () => this.errorTemporal.mostrar('No se pudo consultar el historial.', (valor) => (this.error = valor)),
+      next: (movimientos) => { this.movimientos = movimientos; this.changeDetector.markForCheck(); },
+      error: () => this.errorTemporal.mostrar('No se pudo consultar el historial.', (valor) => (this.error = valor), () => this.changeDetector.markForCheck()),
     });
   }
 

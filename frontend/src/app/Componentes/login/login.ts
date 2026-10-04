@@ -24,7 +24,7 @@ export class Login {
   private readonly errorTemporal = new ErrorTemporal();
 
   private mostrarError(mensaje: string): void {
-    this.errorTemporal.mostrar(mensaje, (valor) => (this.errorMessage = valor));
+    this.errorTemporal.mostrar(mensaje, (valor) => (this.errorMessage = valor), () => this.changeDetector.markForCheck());
   }
 
   toggleMode(): void {

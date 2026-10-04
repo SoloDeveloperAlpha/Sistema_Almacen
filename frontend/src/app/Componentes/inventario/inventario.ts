@@ -1,4 +1,4 @@
-import { afterNextRender, Component, inject } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { InventarioService, Producto, ResumenInventario } from '../../Servicios/inventario.service';
@@ -20,10 +20,12 @@ export class Inventario {
   cargando = false;
 
   private readonly inventario = inject(InventarioService);
+  private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly errorTemporal = new ErrorTemporal();
 
   private mostrarError(mensaje: string): void {
-    this.errorTemporal.mostrar(mensaje, (valor) => (this.error = valor));
+    this.errorTemporal.mostrar(mensaje, (valor) => (this.error = valor), () => this.changeDetector.markForCheck());
+    this.changeDetector.markForCheck();
   }
 
   constructor() {
@@ -35,8 +37,9 @@ export class Inventario {
           this.categorias = inicial.categorias;
           this.resumen = inicial.resumen;
           this.cargando = false;
+          this.changeDetector.markForCheck();
         },
-        error: () => { this.mostrarError('No se pudo cargar el inventario.'); this.cargando = false; },
+        error: () => { this.mostrarError('No se pudo cargar el inventario.'); this.cargando = false; this.changeDetector.markForCheck(); },
       });
     });
   }
@@ -47,7 +50,7 @@ export class Inventario {
     this.inventario.productos(this.buscar, this.categoria).subscribe({
       next: (productos) => (this.productos = productos),
       error: () => this.mostrarError('No se pudo consultar el inventario.'),
-      complete: () => (this.cargando = false),
+      complete: () => { this.cargando = false; this.changeDetector.markForCheck(); },
     });
   }
 

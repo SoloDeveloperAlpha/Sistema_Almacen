@@ -2,7 +2,6 @@ import { afterNextRender, ChangeDetectorRef, Component, inject } from '@angular/
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { InventarioService, Producto } from '../../Servicios/inventario.service';
-import { ErrorTemporal } from '../../Servicios/error-temporal';
 
 @Component({
   imports: [FormsModule, RouterLink],
@@ -13,18 +12,12 @@ import { ErrorTemporal } from '../../Servicios/error-temporal';
 export class RegistroSalida {
   productos: Producto[] = [];
   datos = { productoId: 0, cantidad: 1, motivo: 'Despacho a cliente', destino: '', observaciones: '' };
-  error = '';
   guardando = false;
   cargandoProductos = true;
   private readonly inventario = inject(InventarioService);
   private readonly route = inject(ActivatedRoute, { optional: true });
   private readonly router = inject(Router);
   private readonly changeDetector = inject(ChangeDetectorRef);
-  private readonly errorTemporal = new ErrorTemporal();
-
-  private mostrarError(mensaje: string): void {
-    this.errorTemporal.mostrar(mensaje, (valor) => (this.error = valor));
-  }
 
   constructor() {
     afterNextRender(() => {
@@ -37,7 +30,6 @@ export class RegistroSalida {
           this.changeDetector.markForCheck();
         },
         error: () => {
-          this.mostrarError('No se pudieron cargar los productos.');
           this.cargandoProductos = false;
           this.changeDetector.markForCheck();
         },
@@ -50,12 +42,10 @@ export class RegistroSalida {
   }
 
   guardar(): void {
-    this.errorTemporal.limpiar((valor) => (this.error = valor));
     this.guardando = true;
     this.inventario.registrarSalida(this.datos).subscribe({
       next: () => { this.inventario.invalidarInicial(); this.router.navigateByUrl('/historial'); },
-      error: (error) => {
-        this.mostrarError(error.status === 409 ? 'No hay stock suficiente para esta salida.' : 'No se pudo registrar la salida.');
+      error: () => {
         this.guardando = false;
         this.changeDetector.markForCheck();
       },

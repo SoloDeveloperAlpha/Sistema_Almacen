@@ -1,7 +1,9 @@
 package com.almacen.stock_flow;
 
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import jakarta.validation.constraints.Min;
@@ -42,34 +44,65 @@ public class InventarioService {
         .map(Producto::getCategoria).distinct().sorted().toList();
   }
 
-  public synchronized String siguienteCodigoProducto() {
-    return siguienteCodigoProducto(productoRepository.findAll());
-  }
-
-  private String siguienteCodigoProducto(List<Producto> productos) {
-    int siguiente = productos.stream()
-        .map(Producto::getCodigo)
-        .filter(codigo -> codigo != null && codigo.matches("PROD-\\d{6}"))
-        .mapToInt(codigo -> Integer.parseInt(codigo.substring(5)))
-        .max()
-        .orElse(-1) + 1;
-    return String.format(Locale.ROOT, "PROD-%06d", siguiente);
-  }
-
   @Transactional
   public synchronized Movimiento registrarEntrada(EntradaRequest request, String authorization) {
     Usuario actor = usuarioService.buscarActivoPorToken(authorization);
     if (request.cantidad() <= 0)
       throw badRequest("La cantidad debe ser mayor que cero.");
-    String codigoGenerado = siguienteCodigoProducto();
-    Producto producto = new Producto(codigoGenerado, request.nombre().trim(), request.categoria().trim(),
-        request.unidadMedida().trim(), request.stockMinimo(), request.ubicacion(), request.proveedor(),
-        request.observaciones());
+    String nombre = request.nombre().trim();
+    String categoria = request.categoria().trim();
+    String unidadMedida = request.unidadMedida().trim();
+    String proveedor = request.proveedor().trim();
+
+    // Si ya existe un producto activo con el mismo nombre, categoria y proveedor,
+    // se suma el stock a ese producto en lugar de crear uno duplicado.
+    Producto producto = productoRepository
+        .findByActivoTrueAndNombreIgnoreCaseAndCategoriaIgnoreCaseAndProveedorIgnoreCase(nombre, categoria, proveedor)
+        .orElseGet(() -> new Producto(generarCodigoProducto(nombre, categoria, proveedor), nombre, categoria,
+            unidadMedida, request.stockMinimo(), request.ubicacion(), proveedor, request.observaciones()));
     producto.sumarStock(request.cantidad());
     Producto guardado = productoRepository.save(producto);
     return movimientoRepository
         .save(new Movimiento(TipoMovimiento.ENTRADA, request.cantidad(), "Recepcion de mercancia",
-            request.proveedor(), request.observaciones(), guardado, actor));
+            proveedor, request.observaciones(), guardado, actor));
+  }
+
+  /**
+   * Genera un codigo/SKU a partir de las iniciales del nombre, las 3 primeras letras de la
+   * categoria y las 3 primeras letras del proveedor (sin acentos ni espacios), seguido de un
+   * consecutivo de 4 digitos que evita colisiones cuando distintas combinaciones producen el
+   * mismo prefijo.
+   */
+  private String generarCodigoProducto(String nombre, String categoria, String proveedor) {
+    String prefijo = construirPrefijoCodigo(nombre, categoria, proveedor);
+    int siguiente = productoRepository.findByCodigoStartingWithIgnoreCase(prefijo + "-").stream()
+        .map(Producto::getCodigo)
+        .map(codigo -> codigo.substring(Math.min(prefijo.length() + 1, codigo.length())))
+        .filter(sufijo -> sufijo.matches("\\d{4}"))
+        .mapToInt(Integer::parseInt)
+        .max()
+        .orElse(0) + 1;
+    return String.format(Locale.ROOT, "%s-%04d", prefijo, siguiente);
+  }
+
+  private String construirPrefijoCodigo(String nombre, String categoria, String proveedor) {
+    String iniciales = Arrays.stream(normalizarTexto(nombre).split("\\s+"))
+        .filter(palabra -> !palabra.isBlank())
+        .map(palabra -> palabra.substring(0, 1))
+        .collect(java.util.stream.Collectors.joining());
+    String prefijo = iniciales + recortarTexto(categoria, 3) + recortarTexto(proveedor, 3);
+    return prefijo.isBlank() ? "PROD" : prefijo;
+  }
+
+  private String recortarTexto(String texto, int longitud) {
+    String limpio = normalizarTexto(texto).replace(" ", "");
+    return limpio.substring(0, Math.min(longitud, limpio.length()));
+  }
+
+  private String normalizarTexto(String texto) {
+    String sinAcentos = Normalizer.normalize(texto == null ? "" : texto, Normalizer.Form.NFD)
+        .replaceAll("\\p{M}", "");
+    return sinAcentos.toUpperCase(Locale.ROOT).replaceAll("[^A-Z0-9 ]", "").trim();
   }
 
   @Transactional
@@ -122,7 +155,7 @@ public class InventarioService {
         productos.stream().mapToInt(Producto::getStockActual).sum(),
         productos.stream().filter(p -> p.getStockActual() > 0 && p.getStockActual() <= p.getStockMinimo()).count(),
         productos.stream().filter(p -> p.getStockActual() == 0).count(), movimientoRepository.count());
-    return new InventarioInicial(productos, categorias, resumen, siguienteCodigoProducto(productos));
+    return new InventarioInicial(productos, categorias, resumen);
   }
 
   public String reporteInventarioCsv() {
@@ -155,9 +188,9 @@ public class InventarioService {
     return new ResponseStatusException(HttpStatus.BAD_REQUEST, mensaje);
   }
 
-  public record EntradaRequest(@NotBlank String codigo, @NotBlank String nombre, @NotBlank String categoria,
+  public record EntradaRequest(@NotBlank String nombre, @NotBlank String categoria,
       @NotBlank String unidadMedida, @Min(1) int cantidad, @Min(0) int stockMinimo,
-      String ubicacion, String proveedor, String observaciones) {
+      String ubicacion, @NotBlank String proveedor, String observaciones) {
   }
 
   public record SalidaRequest(@NotNull Long productoId, @Min(1) int cantidad, @NotBlank String motivo,
@@ -167,7 +200,6 @@ public class InventarioService {
   public record ReporteResumen(long productos, long unidades, long stockBajo, long agotados, long movimientos) {
   }
 
-  public record InventarioInicial(List<Producto> productos, List<String> categorias, ReporteResumen resumen,
-      String siguienteCodigo) {
+  public record InventarioInicial(List<Producto> productos, List<String> categorias, ReporteResumen resumen) {
   }
 }

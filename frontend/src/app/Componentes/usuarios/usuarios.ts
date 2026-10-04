@@ -1,4 +1,4 @@
-import { afterNextRender, Component, inject } from '@angular/core';
+import { afterNextRender, ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { InventarioService, UsuarioAdministrado } from '../../Servicios/inventario.service';
 import { ErrorTemporal } from '../../Servicios/error-temporal';
@@ -12,6 +12,7 @@ export class Usuarios {
   usuarios: UsuarioAdministrado[] = [];
   error = '';
   private readonly inventario = inject(InventarioService);
+  private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly errorTemporal = new ErrorTemporal();
 
   constructor() {
@@ -20,14 +21,14 @@ export class Usuarios {
 
   cargar(): void {
     this.inventario.usuarios().subscribe({
-      next: (usuarios) => (this.usuarios = usuarios),
-      error: () => this.errorTemporal.mostrar('Solo un administrador puede gestionar usuarios.', (valor) => (this.error = valor)),
+      next: (usuarios) => { this.usuarios = usuarios; this.changeDetector.markForCheck(); },
+      error: () => this.errorTemporal.mostrar('Solo un administrador puede gestionar usuarios.', (valor) => (this.error = valor), () => this.changeDetector.markForCheck()),
     });
   }
 
   actualizar(usuario: UsuarioAdministrado): void {
     this.inventario.actualizarUsuario(usuario.id, { rol: usuario.rol, activo: usuario.activo }).subscribe({
-      error: () => { this.errorTemporal.mostrar('No se pudo actualizar el usuario.', (valor) => (this.error = valor)); this.cargar(); },
+      error: () => { this.errorTemporal.mostrar('No se pudo actualizar el usuario.', (valor) => (this.error = valor), () => this.changeDetector.markForCheck()); this.cargar(); },
     });
   }
 }

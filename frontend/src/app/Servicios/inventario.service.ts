@@ -40,7 +40,6 @@ export interface InventarioInicial {
   productos: Producto[];
   categorias: string[];
   resumen: ResumenInventario;
-  siguienteCodigo: string;
 }
 
 export interface UsuarioAdministrado {
@@ -86,10 +85,6 @@ export class InventarioService {
   invalidarInicial(): void {
     this.inicial$ = undefined;
     this.inicialToken = '';
-  }
-
-  siguienteCodigo(): Observable<string> {
-    return this.http.get(`${API}/productos/siguiente-codigo`, { headers: this.headers(), responseType: 'text' });
   }
 
   resumen(): Observable<ResumenInventario> {
