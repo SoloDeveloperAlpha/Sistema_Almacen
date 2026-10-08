@@ -79,7 +79,12 @@
               "buildTarget": "Sistema_Almace:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "allowedHosts": [
+              "sistemaalmacen-production.up.railway.app"
+            ]
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
