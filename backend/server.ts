@@ -10,7 +10,18 @@ import { join } from 'node:path';
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+
+const allowedHosts = (
+  process.env['APP_ALLOWED_HOSTS'] ?? 'localhost,127.0.0.1'
+)
+  .split(',')
+  .map((host) => host.trim())
+  .filter(Boolean);
+
+const angularApp = new AngularNodeAppEngine({
+  allowedHosts,
+  trustProxyHeaders: process.env['TRUST_PROXY_HEADERS'] === 'true',
+});
 
 app.get('/runtime-config.js', (_req, res) => {
   const apiBaseUrl = process.env['API_BASE_URL'] || 'http://localhost:8080/api';
