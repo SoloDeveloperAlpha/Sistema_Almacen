@@ -196,6 +196,34 @@ class StockFlowApplicationTests {
 	}
 
 	@Test
+	void inventoryRequiresAuthenticationAtTheSecurityFilter() throws Exception {
+		mockMvc.perform(get("/api/productos"))
+				.andExpect(status().isUnauthorized());
+	}
+
+	@Test
+	void userManagementRequiresAdministratorRole() throws Exception {
+		Usuario operador = usuarioRepository.save(new Usuario(
+				"operador_roles",
+				"Operador Roles",
+				passwordEncoder.encode("clave-segura-2026")));
+
+		mockMvc.perform(get("/api/usuarios")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + operador.getTokenSesion()))
+				.andExpect(status().isForbidden());
+
+		Usuario administrador = usuarioRepository.save(new Usuario(
+				"admin_roles",
+				"Administrador Roles",
+				passwordEncoder.encode("clave-segura-2026"),
+				Rol.ADMINISTRADOR));
+
+		mockMvc.perform(get("/api/usuarios")
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + administrador.getTokenSesion()))
+				.andExpect(status().isOk());
+	}
+
+	@Test
 	void productCodeIsGeneratedFromNameCategorySupplierAndAvoidsPrefixCollisions() throws Exception {
 		Usuario operador = usuarioRepository.save(new Usuario("operador_codigo", "Operador Codigo",
 				passwordEncoder.encode("clave-segura-2026")));

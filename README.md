@@ -17,6 +17,18 @@ Instala lo siguiente antes de comenzar:
 
 El proyecto incluye Maven Wrapper, por lo que no es necesario instalar Maven por separado.
 
+## Tecnologias utilizadas
+
+- **Angular 22 y TypeScript:** forman la interfaz web. Angular organiza la aplicacion en componentes y servicios, y TypeScript aporta tipos que ayudan a detectar errores durante el desarrollo.
+- **Angular CLI y npm:** el CLI sirve la aplicacion localmente y genera la compilacion; npm instala y administra las dependencias del frontend.
+- **Spring Boot 4.1.1 y Java 25:** implementan el backend y la API REST que atiende las solicitudes del frontend. Spring Boot simplifica la configuracion y ejecucion del servidor.
+- **Spring Security y Bean Validation:** permiten proteger las operaciones y validar los datos recibidos por la API.
+- **Spring Data JPA e Hibernate:** relacionan las entidades Java con las tablas y gestionan la persistencia, evitando tener que escribir manualmente las operaciones habituales de base de datos.
+- **MySQL:** almacena de forma persistente los usuarios, productos y movimientos del inventario.
+- **Bootstrap 5, ng-bootstrap y Bootstrap Icons:** proporcionan estilos, componentes visuales e iconos para construir una interfaz adaptable.
+- **Maven Wrapper:** descarga y ejecuta la version de Maven requerida sin que tengas que instalar Maven globalmente.
+- **H2:** se usa como base de datos en memoria para las pruebas del backend, manteniendolas aisladas de la base MySQL de desarrollo.
+
 ## Instalacion
 
 Clona el repositorio y entra en su carpeta:
@@ -165,6 +177,8 @@ WHERE usuario IN ('admin', 'estudiante', 'walter');
 
 ## Recursos
 
+- [Documentacion tecnica: arquitectura, API, observaciones y despliegue](DOCUMENTACION_TECNICA.md)
+- Para desplegar en Railway, crea dos servicios desde la raiz del repositorio: selecciona `Dockerfile.backend` para el backend y `Dockerfile.frontend` para Angular SSR. Configura `API_BASE_URL` y `NG_ALLOWED_HOSTS` en el frontend; `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` y `FRONTEND_ORIGINS` en el backend. Consulta la documentacion tecnica para el orden de configuracion y validacion.
 - [Documentacion de Angular CLI](https://angular.dev/tools/cli)
 - [Documentacion de Spring Boot](https://docs.spring.io/spring-boot/index.html)
 - [Documentacion de MySQL](https://dev.mysql.com/doc/)

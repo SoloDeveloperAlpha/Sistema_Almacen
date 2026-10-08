@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, shareReplay } from 'rxjs';
 import { SesionService } from './sesion.service';
+import { apiBaseUrl } from './api-url';
 
 export interface Producto {
   id: number;
@@ -50,7 +51,7 @@ export interface UsuarioAdministrado {
   activo: boolean;
 }
 
-const API = 'http://localhost:8080/api';
+const API = apiBaseUrl();
 
 @Injectable({ providedIn: 'root' })
 export class InventarioService {

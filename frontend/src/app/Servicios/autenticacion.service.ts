@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, timeout } from 'rxjs';
+import { apiBaseUrl } from './api-url';
 
 export interface RespuestaLogin {
   usuario: string;
@@ -9,9 +10,10 @@ export interface RespuestaLogin {
   token: string;
 }
 
-export const AUTH_LOGIN_URL = 'http://localhost:8080/api/auth/login';
-export const AUTH_REGISTER_URL = 'http://localhost:8080/api/auth/registro';
-export const AUTH_LOGOUT_URL = 'http://localhost:8080/api/auth/logout';
+const AUTH_API = `${apiBaseUrl()}/auth`;
+export const AUTH_LOGIN_URL = `${AUTH_API}/login`;
+export const AUTH_REGISTER_URL = `${AUTH_API}/registro`;
+export const AUTH_LOGOUT_URL = `${AUTH_API}/logout`;
 export const AUTH_REQUEST_TIMEOUT_MS = 10000;
 
 @Injectable({ providedIn: 'root' })

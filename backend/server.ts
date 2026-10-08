@@ -12,6 +12,11 @@ const browserDistFolder = join(import.meta.dirname, '../browser');
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
+app.get('/runtime-config.js', (_req, res) => {
+  const apiBaseUrl = process.env['API_BASE_URL'] || 'http://localhost:8080/api';
+  res.type('application/javascript').send(`window.__APP_CONFIG__ = ${JSON.stringify({ apiBaseUrl })};`);
+});
+
 /**
  * Example Express Rest API endpoints can be defined here.
  * Uncomment and define endpoints as necessary.
