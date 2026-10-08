@@ -1,0 +1,52 @@
+.login-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.login-hero {
+  position: relative;
+  flex: 1 1 55%;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: #fff;
+  background: url('/almacen.jpg') center/cover no-repeat;
+}
+
+.hero-shelves {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 2rem 1rem;
+  opacity: 0.18;
+}
+
+.shelf-row {
+  display: flex;
+  justify-content: space-around;
+  font-size: 4.5rem;
+  border-bottom: 6px solid #fff;
+  padding-bottom: 0.5rem;
+}
+
+.hero-content {
+  position: relative;
+  max-width: 460px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.hero-icon {
+  font-size: 4rem;
+}
+
+.login-panel {
+  flex: 1 1 45%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: #f8f9fa;
+}

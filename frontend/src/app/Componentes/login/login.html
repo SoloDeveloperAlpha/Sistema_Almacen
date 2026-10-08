@@ -1,0 +1,137 @@
+<div class="login-layout">
+  <aside class="login-hero d-none d-lg-flex">
+    <div class="hero-shelves" aria-hidden="true">
+
+    </div>
+
+  </aside>
+
+  <main class="login-panel">
+  <div
+    class="card p-4 shadow-sm border-0 rounded-4 text-center"
+    style="max-width: 420px; width: 100%"
+  >
+    <!-- Barra superior azul decorativa -->
+    <div
+      class="position-absolute top-0 start-0 end-0 bg-primary rounded-top-4"
+      style="height: 5px"
+    ></div>
+
+    <!-- Icono superior de caja -->
+    <div
+      class="d-inline-flex justify-content-center align-items-center bg-primary bg-opacity-10 text-primary rounded-3 p-3 mx-auto mt-3 mb-2"
+      style="width: 50px; height: 50px"
+    >
+      <i class="bi bi-box-seam fs-4"></i>
+    </div>
+
+    <!-- Títulos -->
+    <h3 class="fw-bold mb-1 fs-4 text-dark">StockFlow Almacén</h3>
+    <p class="text-muted small mb-4">
+      {{ isRegisterMode ? 'Crear una cuenta' : 'Acceso al sistema' }}
+    </p>
+
+    <!-- Formulario -->
+    <form
+      autocomplete="off"
+      (submit)="onSubmit($event, usernameInput.value, passwordInput.value, nameInput.value)"
+    >
+      <div class="mb-3 text-start" [hidden]="!isRegisterMode">
+        <label class="form-label fw-semibold small mb-1" for="fullName">Nombre</label>
+        <input
+          type="text"
+          id="fullName"
+          name="fullName"
+          class="form-control bg-light py-2"
+          autocomplete="name"
+          placeholder="Tu nombre"
+          [required]="isRegisterMode"
+          #nameInput
+        />
+      </div>
+
+      <!-- Campo Usuario -->
+      <div class="mb-3 text-start">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <label class="form-label fw-semibold small mb-0" for="username">Usuario</label>
+        </div>
+        <div class="input-group">
+          <input
+            type="text"
+            id="username"
+            name="account_identifier"
+            class="form-control bg-light border-start-0 py-2 ps-3"
+            placeholder="Nombre de usuario"
+            autocomplete="off"
+            minlength="3"
+            maxlength="32"
+
+            #usernameInput
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="mb-3 text-start">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <label class="form-label fw-semibold small mb-0" for="password">Contraseña</label>
+        </div>
+        <div class="input-group">
+          <input
+            type="password"
+            id="password"
+            name="account_secret"
+            class="form-control bg-light border-start-0 border-end-0 py-2 ps-3"
+            [placeholder]="isRegisterMode ? 'Mínimo 8 caracteres' : 'Contraseña'"
+            autocomplete="new-password"
+            [attr.minlength]="isRegisterMode ? 8 : null"
+            maxlength="72"
+            #passwordInput
+            required
+          />
+
+        </div>
+      </div>
+
+      @if (errorMessage) {
+        <div class="alert alert-danger py-2 text-start" role="alert">{{ errorMessage }}</div>
+      }
+
+      <!-- Opciones adicionales -->
+      <div class="d-flex justify-content-between align-items-center mb-4 small" [hidden]="isRegisterMode">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="rememberMe" />
+          <label class="form-check-label text-muted" for="rememberMe">Recordarme</label>
+        </div>
+        <a href="#" class="text-primary text-decoration-none fw-semibold">Recuperar clave</a>
+      </div>
+
+      <button
+        type="submit"
+        class="btn btn-primary w-100 py-2 fw-semibold d-flex justify-content-center align-items-center rounded-3 mb-4"
+        [disabled]="isSubmitting"
+      >
+        {{
+          isSubmitting
+            ? (isRegisterMode ? 'Creando cuenta...' : 'Validando...')
+            : (isRegisterMode ? 'Crear cuenta' : 'Ingresar al sistema')
+        }}
+        <i class="bi bi-arrow-right ms-2"></i>
+      </button>
+    </form>
+
+    <p class="small mb-0">
+      {{ isRegisterMode ? '¿Ya tienes una cuenta?' : '¿Aún no tienes una cuenta?' }}
+      <button type="button" class="btn btn-link btn-sm p-0" (click)="toggleMode()">
+        {{ isRegisterMode ? 'Inicia sesión' : 'Regístrate' }}
+      </button>
+    </p>
+
+    <!-- Pie de página de la tarjeta -->
+    <div class="text-muted font-monospace border-top pt-3 mt-2" style="font-size: 0.75rem">
+      &lt;&gt; Laboratorio Frontend Angular v18 • REST API
+    </div>
+  </div>
+  </main>
+</div>

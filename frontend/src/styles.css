@@ -1,0 +1,7 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Reduce el tamaño de todo el contenido de la aplicación excepto el navbar */
+app-main-layout > main,
+app-main-layout > footer {
+  zoom: 0.85;
+}
