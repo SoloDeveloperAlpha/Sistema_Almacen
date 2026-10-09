@@ -22,11 +22,13 @@ public class InventarioController {
   private final InventarioService inventarioService;
   private final UsuarioService usuarioService;
 
+  // Spring inyecta los servicios que contienen las reglas de inventario y de sesion.
   public InventarioController(InventarioService inventarioService, UsuarioService usuarioService) {
     this.inventarioService = inventarioService;
     this.usuarioService = usuarioService;
   }
 
+  // Consultas de productos e informacion inicial para cargar las vistas del inventario.
   @GetMapping("/productos")
   public List<Producto> productos(@RequestHeader("Authorization") String authorization,
       @RequestParam(required = false) String buscar, @RequestParam(required = false) String categoria) {
@@ -46,6 +48,8 @@ public class InventarioController {
     return inventarioService.inicial();
   }
 
+  // Registra entradas y salidas; @Valid verifica el cuerpo antes de delegar las reglas al servicio.
+  // Si la operacion se completa, ambos endpoints responden con HTTP 201 (Created).
   @PostMapping("/movimientos/entrada")
   public ResponseEntity<MovimientoResponse> entrada(@RequestHeader("Authorization") String authorization,
       @Valid @RequestBody InventarioService.EntradaRequest request) {
@@ -60,6 +64,7 @@ public class InventarioController {
         .body(MovimientoResponse.desde(inventarioService.registrarSalida(request, authorization)));
   }
 
+  // Devuelve el historial aplicando filtros opcionales; las fechas se reciben en formato ISO (YYYY-MM-DD).
   @GetMapping("/movimientos")
   public List<MovimientoResponse> movimientos(@RequestHeader("Authorization") String authorization,
       @RequestParam(required = false) String tipo,
@@ -77,6 +82,7 @@ public class InventarioController {
     return inventarioService.resumen();
   }
 
+  // Los reportes se entregan como archivos CSV descargables, no como respuestas JSON.
   @GetMapping(value = "/reportes/inventario.csv", produces = "text/csv")
   public ResponseEntity<String> reporteInventario(@RequestHeader("Authorization") String authorization) {
     usuarioService.buscarActivoPorToken(authorization);
@@ -93,11 +99,13 @@ public class InventarioController {
     return csvResponse("movimientos.csv", inventarioService.reporteMovimientosCsv(tipo, desde, hasta, buscar));
   }
 
+  // Define el tipo de contenido y el nombre sugerido para la descarga del CSV.
   private ResponseEntity<String> csvResponse(String nombre, String contenido) {
     return ResponseEntity.ok().contentType(MediaType.parseMediaType("text/csv"))
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + nombre).body(contenido);
   }
 
+  // DTO de salida: transforma un movimiento y sus relaciones en datos simples para la API.
   public record MovimientoResponse(Long id, String fecha, TipoMovimiento tipo, int cantidad, String motivo,
       String tercero, String observaciones, Long productoId, String productoCodigo, String productoNombre,
       String usuario) {
