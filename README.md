@@ -10,8 +10,9 @@ Aplicacion web para gestionar el inventario, los registros de entrada y salida, 
 
 Instala lo siguiente antes de comenzar:
 
-- [Node.js](https://nodejs.org/) compatible con npm 11.17.0.
-- Java Development Kit (JDK) 25. Comprueba la version con `java -version`.
+- [Node.js](https://nodejs.org/) 22.22.3 o superior dentro de la rama 22, 24.15.0 o superior dentro de la rama 24, o 26 o superior. Angular 22 no es compatible con todas las versiones intermedias.
+- npm 11.17.0 (la version declarada por el proyecto). Comprueba las versiones con `node --version` y `npm --version`.
+- Java Development Kit (JDK) 25. Comprueba la version con `java --version`.
 - MySQL Server en ejecucion y una cuenta con permisos para crear la base de datos.
 - Git, si vas a clonar el repositorio.
 
@@ -34,14 +35,14 @@ El proyecto incluye Maven Wrapper, por lo que no es necesario instalar Maven por
 Clona el repositorio y entra en su carpeta:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
-cd Sistema_Almace
+git clone https://github.com/SoloDeveloperAlpha/Sistema_Almacen.git
+cd Sistema_Almacen
 ```
 
-Instala las dependencias del frontend desde la raiz del proyecto:
+Instala las dependencias del frontend desde la raiz del proyecto. `npm ci` usa las versiones fijadas en `package-lock.json`:
 
 ```bash
-npm install
+npm ci
 ```
 
 Inicia MySQL antes de levantar el backend. La configuracion predeterminada espera:
@@ -54,6 +55,7 @@ Usuario: root
 ```
 
 La aplicacion crea automaticamente la base `stock_flow` y las tablas `usuarios`, `productos` y `movimientos` si la cuenta configurada tiene permisos suficientes. Las relaciones guardan cada movimiento asociado al producto y al usuario que lo registro. No es necesario ejecutar un script SQL inicial.
+Si tu cuenta no puede crear bases de datos, pide a una cuenta administradora de MySQL que ejecute `CREATE DATABASE stock_flow;` y configura tu cuenta con permisos de lectura, escritura y cambios de estructura (crear y modificar tablas) sobre esa base. Hibernate creara y actualizara las tablas al iniciar el backend.
 
 ## Ejecutar en desarrollo
 
@@ -105,6 +107,12 @@ Para crear el primer administrador, define su nombre de usuario antes de iniciar
 
 ```powershell
 $env:BOOTSTRAP_ADMIN_USERNAME = "admin"
+```
+
+En macOS o Linux:
+
+```bash
+export BOOTSTRAP_ADMIN_USERNAME=admin
 ```
 
 Solo una cuenta cuyo nombre coincida con esa variable recibe el rol `ADMINISTRADOR`. Después de iniciar sesion, el administrador puede abrir **Usuarios** para activar cuentas y cambiar roles. Las cuentas normales tienen el rol `OPERATIVO`.
@@ -177,7 +185,6 @@ WHERE usuario IN ('admin', 'estudiante', 'walter');
 
 ## Recursos
 
-- [Documentacion tecnica: arquitectura, API, observaciones y despliegue](DOCUMENTACION_TECNICA.md)
 - [Documentacion de Angular CLI](https://angular.dev/tools/cli)
 - [Documentacion de Spring Boot](https://docs.spring.io/spring-boot/index.html)
 - [Documentacion de MySQL](https://dev.mysql.com/doc/)
